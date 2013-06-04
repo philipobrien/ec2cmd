@@ -1,6 +1,6 @@
 ec2cmd
 ==========
-Command line client for Amazon EC2. V0.1. 
+Command line client for Amazon EC2.
 
 Provides a wrapper for some of the core functionality of the EC2 command-line tools.
 
