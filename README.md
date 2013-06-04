@@ -12,6 +12,8 @@ Start ec2cmd in interactive mode. Available commands:
 
 `ec2> help` show interactive help
 
+`ec2> describe` describe instances associated with the account
+
 `ec2> list` list all elastic IPs for account in region
 
 `ec2> start <instance #>` start the corresponding instance
