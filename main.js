@@ -16,7 +16,7 @@
  */
 
 var AWS       = require('aws-sdk');
-AWS.config.loadFromPath('./config.json');
+AWS.config.loadFromPath('/Users/Philip/Study/AWS/keys/betaconfig.json');
 
 var readline  = require('readline');
 var fs        = require('fs');
@@ -41,7 +41,7 @@ var promptForInput = function() {
 
 exports.main = function() {
 
-  var data = fs.readFileSync('./config.json');
+  var data = fs.readFileSync('/Users/Philip/Study/AWS/keys/betaconfig.json');
   var myObj;
 
   try {
@@ -264,14 +264,13 @@ var associate = function(instance, IP, callback) {
 var connect = function(instance, callback) {
   var host = AMIs.dns[+instance-1];
   var user;
-  if (AMIs.name[+instance-1] == "EMR") {
+  if (AMIs.name[+instance-1] == "luma-emr") {
     user = "hadoop";
   } else {
     user = "ubuntu";
   }
 
   var ssh   = spawn('ssh', ['-tt', '-o', 'StrictHostKeyChecking=no', '-i', pem, '-l', user, host]);
-
   ssh.stdout.pipe(process.stdout, { end: false });
   process.stdin.resume();
   process.stdin.pipe(ssh.stdin, { end: false });
@@ -283,6 +282,7 @@ var connect = function(instance, callback) {
 
 /**
  * copy file/directory from ec2 instance to local machine
+ * add option for copying directory as well as just files (pass -r as an option to scp)
  */
 
 var download = function(src, instance, dest, callback) {
@@ -296,7 +296,7 @@ var download = function(src, instance, dest, callback) {
     user = "ubuntu";
   }
 
-  var scpCmd = "scp -o StrictHostKeyChecking=no -i " + pem + " " + user + "@" + host + src + " " + dest;
+  var scpCmd = "scp -r -o StrictHostKeyChecking=no -i " + pem + " " + user + "@" + host + src + " " + dest;
   var scp = exec(scpCmd, function (error) {
     if (error) {
       console.log("Error!");
