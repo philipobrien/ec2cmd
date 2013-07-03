@@ -16,7 +16,7 @@
  */
 
 var AWS       = require('aws-sdk');
-AWS.config.loadFromPath('/Users/Philip/Study/AWS/keys/betaconfig.json');
+AWS.config.loadFromPath('./config.json');
 
 var readline  = require('readline');
 var fs        = require('fs');
@@ -41,7 +41,7 @@ var promptForInput = function() {
 
 exports.main = function() {
 
-  var data = fs.readFileSync('/Users/Philip/Study/AWS/keys/betaconfig.json');
+  var data = fs.readFileSync('./config.json');
   var myObj;
 
   try {
@@ -264,7 +264,7 @@ var associate = function(instance, IP, callback) {
 var connect = function(instance, callback) {
   var host = AMIs.dns[+instance-1];
   var user;
-  if (AMIs.name[+instance-1] == "luma-emr") {
+  if (AMIs.name[+instance-1] == "EMR") {
     user = "hadoop";
   } else {
     user = "ubuntu";
