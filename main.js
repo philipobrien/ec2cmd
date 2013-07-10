@@ -95,15 +95,27 @@ var runCommand = function(rl, input, callback) {
       callback();
     });
   }
-  else if (input.indexOf("download") > -1) {
+  else if (input.indexOf("downloadfile") > -1) {
     params = input.split(" ");
     download(params[1], params[2], params[3], function() {
       callback();
     });
   }
-  else if (input.indexOf("upload") > -1) {
+  else if (input.indexOf("uploadfile") > -1) {
     params = input.split(" ");
     upload(params[1], params[2], params[3], function() {
+      callback();
+    });
+  }
+  else if (input.indexOf("downloaddir") > -1) {
+    params = input.split(" ");
+    downloaddir(params[1], params[2], params[3], function() {
+      callback();
+    });
+  }
+  else if (input.indexOf("uploaddir") > -1) {
+    params = input.split(" ");
+    uploaddir(params[1], params[2], params[3], function() {
       callback();
     });
   }
@@ -121,15 +133,17 @@ var runCommand = function(rl, input, callback) {
 
 var help = function() {
   console.log("");
-  console.log("describe                                     - describe instances");
-  console.log("list                                         - list all elastic IPs in this region");
-  console.log("start <instance #>                           - start instance");
-  console.log("stop <instance #>                            - stop instance");
-  console.log("associate <instance #> <elastic IP>          - associate IPs to AMIs");
-  console.log("connect <instance #>                         - ssh to instance");
-  console.log("download /path/to/file <instance #> /dest    - download from instance to local");
-  console.log("upload /path/to/file <instance #> /dest      - upload from local to instance");
-  console.log("exit                                         - to quit");
+  console.log("describe                                             - describe instances");
+  console.log("list                                                 - list all elastic IPs in this region");
+  console.log("start <instance #>                                   - start instance");
+  console.log("stop <instance #>                                    - stop instance");
+  console.log("associate <instance #> <elastic IP>                  - associate IPs to AMIs");
+  console.log("connect <instance #>                                 - ssh to instance");
+  console.log("downloadfile /path/to/file <instance #> /dest        - download from instance to local");
+  console.log("uploadfile /path/to/file <instance #> /dest          - upload from local to instance");
+  console.log("downloaddir /path/to/directory <instance #> /dest    - download from instance to local");
+  console.log("uploaddir /path/to/directory <instance #> /dest      - upload from local to instance");
+  console.log("exit                                                 - to quit");
   console.log("");
 };
 
@@ -281,11 +295,68 @@ var connect = function(instance, callback) {
 };
 
 /**
- * copy file/directory from ec2 instance to local machine
- * add option for copying directory as well as just files (pass -r as an option to scp)
+ * copy file from ec2 instance to local machine
+ *
  */
 
 var download = function(src, instance, dest, callback) {
+
+  var host = AMIs.dns[+instance-1];
+  var user;
+  src = ":" + src;
+  if (AMIs.name[+instance-1] == "EMR") {
+    user = "hadoop";
+  } else {
+    user = "ubuntu";
+  }
+
+  var scpCmd = "scp -o StrictHostKeyChecking=no -i " + pem + " " + user + "@" + host + src + " " + dest;
+  var scp = exec(scpCmd, function (error) {
+    if (error) {
+      console.log("Error!");
+      console.log("Usage: download /path/to/source/ <instance #> /path/to/dest");
+    }
+    else {
+      console.log("Transfer Successful");
+    }
+    callback();
+  });
+};
+
+/**
+ * copy file from local to ec2 instance
+ */
+
+var upload = function(src, instance, dest, callback) {
+
+  var host = AMIs.dns[+instance-1];
+  var user;
+  dest = ":" + dest;
+  if (AMIs.name[+instance-1] == "EMR") {
+    user = "hadoop";
+  } else {
+    user = "ubuntu";
+  }
+  var scpCmd = "scp -o StrictHostKeyChecking=no -i " + pem + " " + src + " " + user + "@" + host + dest;
+  var scp = exec(scpCmd, function (error) {
+    if (error) {
+      console.log("Error!");
+      console.log("Usage: upload /path/to/source/ <instance #> /path/to/dest");
+    }
+    else {
+      console.log("Transfer Successful");
+    }
+    callback();
+  });
+};
+
+
+/**
+ * copy directory from ec2 instance to local machine
+ * 
+ */
+
+var downloaddir = function(src, instance, dest, callback) {
 
   var host = AMIs.dns[+instance-1];
   var user;
@@ -300,6 +371,7 @@ var download = function(src, instance, dest, callback) {
   var scp = exec(scpCmd, function (error) {
     if (error) {
       console.log("Error!");
+      console.log(error);
       console.log("Usage: download /path/to/source/ <instance #> /path/to/dest");
     }
     else {
@@ -310,10 +382,10 @@ var download = function(src, instance, dest, callback) {
 };
 
 /**
- * copy file/directory from local to ec2 instance
+ * copy directory from local to ec2 instance
  */
 
-var upload = function(src, instance, dest, callback) {
+var uploaddir = function(src, instance, dest, callback) {
 
   var host = AMIs.dns[+instance-1];
   var user;
@@ -323,7 +395,7 @@ var upload = function(src, instance, dest, callback) {
   } else {
     user = "ubuntu";
   }
-  var scpCmd = "scp -o StrictHostKeyChecking=no -i " + pem + " " + src + " " + user + "@" + host + dest;
+  var scpCmd = "scp -r -o StrictHostKeyChecking=no -i " + pem + " " + src + " " + user + "@" + host + dest;
   var scp = exec(scpCmd, function (error) {
     if (error) {
       console.log("Error!");
