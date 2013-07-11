@@ -24,9 +24,13 @@ Start ec2cmd in interactive mode. Available commands:
 
 `ec2> connect <user> <instance #>` connect to instance via ssh
 
-`ec2> download /path/to/file <instance #> /dest` download file/directory from instance to local 
+`ec2> downloadfile /path/to/file <instance #> /dest` download from instance to local 
 
-`ec2> upload /path/to/file <instance #> /dest` upload file/directory from local to instance 
+`ec2> uploadfile /path/to/file <instance #> /dest` upload from local to instance 
+
+`ec2> downloaddir /path/to/directory <instance #> /dest` download from instance to local 
+
+`ec2> uploaddir /path/to/directory <instance #> /dest` upload from local to instance 
 
 `ec2> exit` to quit
 
@@ -50,8 +54,8 @@ Start ec2cmd in interactive mode. Available commands:
 
 `ec2> connect ubuntu 1` will connect to *Test Server* via ssh as ubuntu
 
-`ec2> download ~/index.html 1 ~/Desktop` will copy index.html from *Test Server* to your desktop via scp
+`ec2> downloadfile ~/index.html 1 ~/Desktop` will copy index.html from *Test Server* to your desktop via scp
 
-`ec2> upload ~/Desktop/index.html 1 ~/` will copy index.html from your desktop to the home directory of *Test Server* via scp
+`ec2> uploadfile ~/Desktop/index.html 1 ~/` will copy index.html from your desktop to the home directory of *Test Server* via scp
 
 `ec2> associate 1 10.11.12.10` will associate this elastic IP with *Test Server*
